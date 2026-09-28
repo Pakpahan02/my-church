@@ -1,388 +1,650 @@
+import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { dashboard, login } from '@/routes';
-import { register } from '@/routes';
+import { HkbpLogo } from '@/components/hkbp-logo';
+import {
+    Sun,
+    Clock,
+    BookOpen,
+    Users,
+    MapPin,
+    Mail,
+    Share2,
+    Check,
+    Menu,
+    X,
+    Calendar,
+    ArrowRight,
+    LogIn,
+    UserCheck,
+} from 'lucide-react';
 
 export default function Welcome() {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: { user: { name: string; email: string } | null } }>().props;
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    // Share devotional function
+    const handleShareDevotional = async () => {
+        const shareData = {
+            title: 'Renungan Harian - HKBP Citra Indah',
+            text: 'Tuhan adalah Gembalaku (Mazmur 23:1-2) - "TUHAN adalah gembalaku, takkan kekurangan aku. Ia membaringkan aku di padang yang berumput hijau, Ia membimbing aku ke air yang tenang."',
+            url: window.location.href,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch {
+                // User cancelled or share failed, fallback to copy
+                copyToClipboard(shareData.text);
+            }
+        } else {
+            copyToClipboard(shareData.text);
+        }
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
+    };
 
     return (
         <>
-            <Head title="Welcome" />
-            <div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
-                <header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
-                    <nav className="flex items-center justify-end gap-4">
-                        {auth.user ? (
-                            <Link
-                                href={dashboard()}
-                                className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+            <Head>
+                <title>HKBP Citra Indah - Ressort Jonggol</title>
+                <meta
+                    name="description"
+                    content="Situs resmi HKBP Citra Indah Ressort Jonggol. Melayani dengan kasih, bertumbuh dalam iman, berbuah bagi sesama."
+                />
+            </Head>
+
+            <div className="min-h-screen bg-white text-slate-800 font-sans selection:bg-blue-600 selection:text-white scroll-smooth">
+                {/* ========================================================================= */}
+                {/* 1. NAVBAR                                                                 */}
+                {/* ========================================================================= */}
+                <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs transition-all">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between h-20">
+                            {/* Brand Logo & Name */}
+                            <a href="#beranda" className="flex items-center gap-3.5 group">
+                                <HkbpLogo className="w-11 h-11 shrink-0 group-hover:scale-105 transition-transform duration-200" />
+                                <div className="flex flex-col">
+                                    <span className="font-extrabold text-lg sm:text-xl text-[#1e3a8a] tracking-tight leading-tight">
+                                        HKBP Citra Indah
+                                    </span>
+                                    <span className="text-xs font-medium text-slate-500 tracking-normal">
+                                        Ressort Jonggol
+                                    </span>
+                                </div>
+                            </a>
+
+                            {/* Desktop Nav Items */}
+                            <nav className="hidden md:flex items-center gap-8">
+                                <a
+                                    href="#beranda"
+                                    className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+                                >
+                                    Beranda
+                                </a>
+                                <a
+                                    href="#renungan"
+                                    className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+                                >
+                                    Renungan
+                                </a>
+                                <a
+                                    href="#layanan"
+                                    className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+                                >
+                                    Layanan
+                                </a>
+                                <a
+                                    href="#statistik"
+                                    className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors"
+                                >
+                                    Statistik
+                                </a>
+
+                                {/* Jadwal Ibadah Pill Button */}
+                                <a
+                                    href="#layanan"
+                                    className="inline-flex items-center justify-center rounded-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-medium text-sm px-6 py-2.5 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 transition-all transform active:scale-95"
+                                >
+                                    Jadwal Ibadah
+                                </a>
+
+                                {/* User Auth Link (if logged in or for login) */}
+                                {auth?.user ? (
+                                    <Link
+                                        href={dashboard()}
+                                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 px-3.5 py-1.5 rounded-full transition-colors"
+                                        title={`Masuk sebagai ${auth.user.name}`}
+                                    >
+                                        <UserCheck className="w-3.5 h-3.5" />
+                                        Dashboard
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={login()}
+                                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-blue-700 transition-colors"
+                                        title="Login Pengurus / Jemaat"
+                                    >
+                                        <LogIn className="w-3.5 h-3.5" />
+                                        Masuk
+                                    </Link>
+                                )}
+                            </nav>
+
+                            {/* Mobile Menu Button */}
+                            <div className="flex md:hidden items-center gap-3">
+                                <a
+                                    href="#layanan"
+                                    className="rounded-full bg-[#1d4ed8] text-white font-medium text-xs px-3.5 py-2"
+                                >
+                                    Ibadah
+                                </a>
+                                <button
+                                    type="button"
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                    className="p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-slate-100 focus:outline-hidden"
+                                    aria-label="Buka menu navigasi"
+                                >
+                                    {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Menu Dropdown */}
+                    {mobileMenuOpen && (
+                        <div className="md:hidden bg-white border-b border-slate-100 px-4 pt-3 pb-6 space-y-3 shadow-xl animate-in slide-in-from-top-2 duration-200">
+                            <a
+                                href="#beranda"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50"
                             >
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <>
-                                <Link
-                                    href={login()}
-                                    className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                                Beranda
+                            </a>
+                            <a
+                                href="#renungan"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50"
+                            >
+                                Renungan
+                            </a>
+                            <a
+                                href="#layanan"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50"
+                            >
+                                Layanan
+                            </a>
+                            <a
+                                href="#statistik"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50"
+                            >
+                                Statistik
+                            </a>
+                            <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+                                <a
+                                    href="#layanan"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="w-full text-center rounded-full bg-[#1d4ed8] text-white font-medium py-2.5 text-sm"
                                 >
-                                    Log in
-                                </Link>
-                                <Link
-                                    href={register()}
-                                    className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                                >
-                                    Register
-                                </Link>
-                            </>
-                        )}
-                    </nav>
+                                    Jadwal Ibadah
+                                </a>
+                                {auth?.user ? (
+                                    <Link
+                                        href={dashboard()}
+                                        className="w-full text-center rounded-full bg-slate-100 text-slate-800 font-medium py-2 text-sm"
+                                    >
+                                        Buka Dashboard ({auth.user.name})
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={login()}
+                                        className="w-full text-center rounded-full border border-slate-200 text-slate-700 font-medium py-2 text-sm"
+                                    >
+                                        Masuk Akun
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </header>
-                <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
-                    <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
-                        <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
-                            <h1 className="mb-1 font-medium">
-                                Let's get started
-                            </h1>
-                            <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                                Laravel has an incredibly rich ecosystem.
-                                <br />
-                                We suggest starting with the following.
+
+                {/* ========================================================================= */}
+                {/* 2. HERO SECTION                                                           */}
+                {/* ========================================================================= */}
+                <section
+                    id="beranda"
+                    className="relative min-h-[600px] lg:min-h-[680px] flex items-center justify-center overflow-hidden bg-slate-900"
+                >
+                    {/* Background Image with Deep Blue Overlay */}
+                    <div
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
+                        style={{ backgroundImage: `url('/images/hero-bg.jpg')` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#0b2158]/90 via-[#123b8c]/85 to-[#1d4ed8]/90 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-radial from-transparent via-[#0d2869]/40 to-[#06153b]/85" />
+
+                    {/* Hero Content */}
+                    <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center text-white">
+                        {/* Emblem Logo */}
+                        <div className="inline-flex p-2 rounded-full bg-white/10 backdrop-blur-md shadow-2xl mb-6 ring-1 ring-white/20">
+                            <HkbpLogo className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-2xl" />
+                        </div>
+
+                        {/* Main Heading */}
+                        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight drop-shadow-md">
+                            <span className="block text-white">Selamat Datang di</span>
+                            <span className="block mt-1 text-white font-black">
+                                HKBP Citra Indah
+                            </span>
+                        </h1>
+
+                        {/* Slogan */}
+                        <p className="mt-6 text-sm sm:text-base lg:text-lg text-blue-100/95 max-w-2xl mx-auto leading-relaxed drop-shadow-xs font-normal">
+                            &quot;Melayani dengan Kasih, Bertumbuh dalam Iman, Berbuah bagi Sesama.&quot;
+                            <br className="hidden sm:inline" />{' '}
+                            Mari bergabung bersama kami dalam persekutuan dan ibadah.
+                        </p>
+
+                        {/* Call-to-Action Buttons */}
+                        <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+                            <a
+                                href="#layanan"
+                                className="rounded-full bg-white text-[#123b8c] hover:bg-blue-50 font-bold px-7 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
+                            >
+                                Lihat Layanan
+                            </a>
+                            <a
+                                href="#renungan"
+                                className="rounded-full bg-[#0d255c]/60 text-white border border-white/25 backdrop-blur-md hover:bg-[#0d255c]/90 font-semibold px-7 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0"
+                            >
+                                Renungan Hari Ini
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Wave Divider to Next Section */}
+                    <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none">
+                        <svg
+                            className="relative block w-full h-10 sm:h-16 lg:h-24 text-white"
+                            viewBox="0 0 1440 120"
+                            preserveAspectRatio="none"
+                            fill="currentColor"
+                        >
+                            <path d="M0,40 C320,120 720,0 1140,80 C1280,105 1380,95 1440,80 L1440,120 L0,120 Z" />
+                        </svg>
+                    </div>
+                </section>
+
+                {/* ========================================================================= */}
+                {/* 3. RENUNGAN HARIAN                                                        */}
+                {/* ========================================================================= */}
+                <section id="renungan" className="py-20 sm:py-24 bg-white relative">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        {/* Section Header */}
+                        <div className="text-center mb-12">
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a] tracking-tight">
+                                Renungan Harian
+                            </h2>
+                            <div className="w-12 h-1 bg-[#1d4ed8] rounded-full mx-auto my-3" />
+                            <p className="text-slate-500 text-sm sm:text-base">
+                                Santapan rohani untuk menemani langkah Anda hari ini.
                             </p>
-                            <ul className="mb-4 flex flex-col lg:mb-6">
-                                <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
-                                    <span className="relative bg-white py-1 dark:bg-[#161615]">
-                                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
+                        </div>
+
+                        {/* Devotional Card */}
+                        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden p-6 sm:p-10 transition-all hover:shadow-2xl">
+                            {/* Card Header */}
+                            <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+                                <span className="text-xs font-bold uppercase tracking-wider text-[#1d4ed8]">
+                                    MANNA SORGAWI
+                                </span>
+                                <span className="text-xs text-slate-400 font-medium">
+                                    Senin, 28 Sep 2026
+                                </span>
+                            </div>
+
+                            {/* Card Content */}
+                            <div className="text-center">
+                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-1 font-serif">
+                                    Tuhan adalah Gembalaku
+                                </h3>
+                                <p className="text-[#1d4ed8] text-sm font-semibold mb-6">
+                                    Mazmur 23:1-2
+                                </p>
+
+                                {/* Scripture Quote */}
+                                <blockquote className="text-slate-700 italic font-serif text-sm sm:text-base leading-relaxed mb-6 px-2 sm:px-6">
+                                    &quot;TUHAN adalah gembalaku, takkan kekurangan aku. Ia membaringkan aku di padang yang berumput hijau, Ia membimbing aku ke air yang tenang.&quot;
+                                </blockquote>
+
+                                {/* Reflection Body */}
+                                <div className="text-slate-600 text-xs sm:text-sm leading-relaxed space-y-4 text-left mb-8">
+                                    <p>
+                                        Dalam kebisingan dunia modern yang penuh tuntutan, kita sering merasa lelah, cemas, dan merasa kurang. Daud mengingatkan kita pada satu kebenaran yang membebaskan: ketika Tuhan menjadi Gembala kita, Ia bertanggung jawab penuh atas hidup kita.
+                                    </p>
+                                    <p>
+                                        Tuhan tidak hanya memberikan apa yang kita butuhkan, tetapi Ia juga memberikan kedamaian sejati—rumput hijau dan air yang tenang. Hari ini, izinkan Sang Gembala Agung menuntun langkah Anda. Berhentilah sejenak, nikmati penyertaan-Nya, dan percayalah bahwa dalam Dia, Anda tidak akan pernah kekurangan.
+                                    </p>
+                                </div>
+
+                                {/* Share Action Button */}
+                                <div className="flex justify-center">
+                                    <button
+                                        type="button"
+                                        onClick={handleShareDevotional}
+                                        className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#1d4ed8] hover:text-blue-700 bg-blue-50/80 hover:bg-blue-100/80 px-6 py-2.5 rounded-full transition-all duration-200 cursor-pointer shadow-xs active:scale-95"
+                                    >
+                                        {copied ? (
+                                            <>
+                                                <Check className="w-4 h-4 text-emerald-600" />
+                                                <span className="text-emerald-700">Tersalin ke Clipboard!</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Share2 className="w-4 h-4" />
+                                                <span>Bagikan Renungan</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ========================================================================= */}
+                {/* 4. LAYANAN GEREJA                                                         */}
+                {/* ========================================================================= */}
+                <section id="layanan" className="py-20 bg-slate-50/60 border-t border-slate-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        {/* Section Header */}
+                        <div className="text-center mb-14">
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1e3a8a] tracking-tight">
+                                Layanan Gereja
+                            </h2>
+                            <div className="w-12 h-1 bg-[#1d4ed8] rounded-full mx-auto my-3" />
+                            <p className="text-slate-500 text-sm sm:text-base max-w-xl mx-auto">
+                                Kami mengundang seluruh jemaat untuk hadir dan bersekutu bersama dalam berbagai layanan ibadah yang tersedia.
+                            </p>
+                        </div>
+
+                        {/* Services Grid (4 Cards) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                            {/* Card 1: Ibadah Minggu Pagi */}
+                            <div className="bg-white rounded-2xl p-7 flex flex-col items-center text-center shadow-lg shadow-slate-200/50 border border-slate-100 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group">
+                                <div className="w-14 h-14 rounded-full bg-blue-50 text-[#1d4ed8] flex items-center justify-center mb-5 ring-8 ring-blue-50/60 group-hover:scale-110 transition-transform">
+                                    <Sun className="w-6 h-6" />
+                                </div>
+                                <h3 className="font-bold text-slate-900 text-base mb-1.5">
+                                    Ibadah Minggu Pagi
+                                </h3>
+                                <p className="text-slate-500 text-xs text-center mb-6 leading-relaxed">
+                                    Ibadah Umum Bahasa Batak/Indonesia
+                                </p>
+                                <span className="mt-auto inline-block border border-blue-200 text-[#1d4ed8] bg-blue-50/50 text-xs font-semibold px-4 py-1.5 rounded-full">
+                                    Pukul 07.00 WIB
+                                </span>
+                            </div>
+
+                            {/* Card 2: Ibadah Minggu Siang */}
+                            <div className="bg-white rounded-2xl p-7 flex flex-col items-center text-center shadow-lg shadow-slate-200/50 border border-slate-100 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group">
+                                <div className="w-14 h-14 rounded-full bg-blue-50 text-[#1d4ed8] flex items-center justify-center mb-5 ring-8 ring-blue-50/60 group-hover:scale-110 transition-transform">
+                                    <Clock className="w-6 h-6" />
+                                </div>
+                                <h3 className="font-bold text-slate-900 text-base mb-1.5">
+                                    Ibadah Minggu Siang
+                                </h3>
+                                <p className="text-slate-500 text-xs text-center mb-6 leading-relaxed">
+                                    Ibadah Umum Bahasa Indonesia
+                                </p>
+                                <span className="mt-auto inline-block border border-blue-200 text-[#1d4ed8] bg-blue-50/50 text-xs font-semibold px-4 py-1.5 rounded-full">
+                                    Pukul 10.00 WIB
+                                </span>
+                            </div>
+
+                            {/* Card 3: Sekolah Minggu */}
+                            <div className="bg-white rounded-2xl p-7 flex flex-col items-center text-center shadow-lg shadow-slate-200/50 border border-slate-100 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group">
+                                <div className="w-14 h-14 rounded-full bg-blue-50 text-[#1d4ed8] flex items-center justify-center mb-5 ring-8 ring-blue-50/60 group-hover:scale-110 transition-transform">
+                                    <BookOpen className="w-6 h-6" />
+                                </div>
+                                <h3 className="font-bold text-slate-900 text-base mb-1.5">
+                                    Sekolah Minggu
+                                </h3>
+                                <p className="text-slate-500 text-xs text-center mb-6 leading-relaxed">
+                                    Ibadah khusus anak-anak sekolah minggu
+                                </p>
+                                <span className="mt-auto inline-block border border-blue-200 text-[#1d4ed8] bg-blue-50/50 text-xs font-semibold px-4 py-1.5 rounded-full">
+                                    Pukul 07.00 & 10.00 WIB
+                                </span>
+                            </div>
+
+                            {/* Card 4: Remaja / Naposobulung */}
+                            <div className="bg-white rounded-2xl p-7 flex flex-col items-center text-center shadow-lg shadow-slate-200/50 border border-slate-100 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 group">
+                                <div className="w-14 h-14 rounded-full bg-blue-50 text-[#1d4ed8] flex items-center justify-center mb-5 ring-8 ring-blue-50/60 group-hover:scale-110 transition-transform">
+                                    <Users className="w-6 h-6" />
+                                </div>
+                                <h3 className="font-bold text-slate-900 text-base mb-1.5">
+                                    Remaja / Naposobulung
+                                </h3>
+                                <p className="text-slate-500 text-xs text-center mb-6 leading-relaxed">
+                                    Persekutuan pemuda dan remaja gereja
+                                </p>
+                                <span className="mt-auto inline-block border border-blue-200 text-[#1d4ed8] bg-blue-50/50 text-xs font-semibold px-4 py-1.5 rounded-full">
+                                    Sabtu, Pukul 18.00 WIB
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ========================================================================= */}
+                {/* 5. STATISTIK JEMAAT                                                       */}
+                {/* ========================================================================= */}
+                <section
+                    id="statistik"
+                    className="py-20 sm:py-24 bg-gradient-to-b from-[#1b3f8e] via-[#1a3b85] to-[#153272] text-white relative overflow-hidden"
+                >
+                    {/* Subtle decorative background circles */}
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        {/* Section Header */}
+                        <div className="text-center mb-10">
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                Statistik Jemaat
+                            </h2>
+                            <div className="w-12 h-1 bg-blue-300 rounded-full mx-auto my-3" />
+                            <p className="text-blue-100/90 text-sm sm:text-base max-w-xl mx-auto">
+                                Informasi jumlah pelayan dan jemaat yang diberkati di HKBP Citra Indah Jonggol.
+                            </p>
+                        </div>
+
+                        {/* Top Highlight Card: TOTAL JEMAAT */}
+                        <div className="max-w-xs mx-auto bg-blue-900/40 border border-blue-400/20 backdrop-blur-md rounded-2xl p-6 text-center shadow-2xl shadow-blue-950/40 mb-8 hover:bg-blue-900/50 transition-colors">
+                            <span className="text-xs uppercase tracking-wider font-semibold text-blue-200 block mb-1">
+                                TOTAL JEMAAT
+                            </span>
+                            <div className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none my-1">
+                                1,245
+                            </div>
+                            <span className="text-xs text-blue-200 font-medium">
+                                Jiwa
+                            </span>
+                        </div>
+
+                        {/* 5 Sub-category Cards */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
+                            {/* Pria */}
+                            <div className="bg-blue-900/30 border border-blue-400/15 backdrop-blur-sm rounded-xl py-5 px-4 text-center hover:bg-blue-800/40 transition-colors">
+                                <div className="text-2xl sm:text-3xl font-bold text-white mb-0.5">
+                                    480
+                                </div>
+                                <div className="text-xs font-medium text-blue-200">
+                                    Pria
+                                </div>
+                            </div>
+
+                            {/* Wanita */}
+                            <div className="bg-blue-900/30 border border-blue-400/15 backdrop-blur-sm rounded-xl py-5 px-4 text-center hover:bg-blue-800/40 transition-colors">
+                                <div className="text-2xl sm:text-3xl font-bold text-white mb-0.5">
+                                    510
+                                </div>
+                                <div className="text-xs font-medium text-blue-200">
+                                    Wanita
+                                </div>
+                            </div>
+
+                            {/* Anak-anak */}
+                            <div className="bg-blue-900/30 border border-blue-400/15 backdrop-blur-sm rounded-xl py-5 px-4 text-center hover:bg-blue-800/40 transition-colors">
+                                <div className="text-2xl sm:text-3xl font-bold text-white mb-0.5">
+                                    120
+                                </div>
+                                <div className="text-xs font-medium text-blue-200">
+                                    Anak-anak
+                                </div>
+                            </div>
+
+                            {/* Remaja/Pemuda */}
+                            <div className="bg-blue-900/30 border border-blue-400/15 backdrop-blur-sm rounded-xl py-5 px-4 text-center hover:bg-blue-800/40 transition-colors">
+                                <div className="text-2xl sm:text-3xl font-bold text-white mb-0.5">
+                                    85
+                                </div>
+                                <div className="text-xs font-medium text-blue-200">
+                                    Remaja/Pemuda
+                                </div>
+                            </div>
+
+                            {/* Lansia */}
+                            <div className="col-span-2 sm:col-span-1 bg-blue-900/30 border border-blue-400/15 backdrop-blur-sm rounded-xl py-5 px-4 text-center hover:bg-blue-800/40 transition-colors">
+                                <div className="text-2xl sm:text-3xl font-bold text-white mb-0.5">
+                                    50
+                                </div>
+                                <div className="text-xs font-medium text-blue-200">
+                                    Lansia
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ========================================================================= */}
+                {/* 6. FOOTER                                                                 */}
+                {/* ========================================================================= */}
+                <footer className="bg-[#0b1120] text-slate-300 border-t border-slate-800">
+                    <div className="max-w-6xl mx-auto py-14 px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                            {/* Column 1: Church Identity */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <HkbpLogo className="w-9 h-9 shrink-0" />
+                                    <span className="font-extrabold text-lg text-white tracking-tight">
+                                        HKBP Citra Indah
+                                    </span>
+                                </div>
+                                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-sm">
+                                    Gereja Huria Kristen Batak Protestan Ressort Jonggol, melayani jemaat di kawasan Citra Indah City dan sekitarnya dengan kasih Kristus.
+                                </p>
+                            </div>
+
+                            {/* Column 2: Hubungi Kami */}
+                            <div>
+                                <h4 className="text-white font-bold text-sm tracking-wide mb-4">
+                                    Hubungi Kami
+                                </h4>
+                                <ul className="space-y-3.5 text-xs sm:text-sm text-slate-400">
+                                    <li className="flex items-start gap-3">
+                                        <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                                        <span>
+                                            Perumahan Citra Indah City, Kecamatan Jonggol, Kab. Bogor, Jawa Barat
                                         </span>
-                                    </span>
-                                    <span>
-                                        Read the
+                                    </li>
+                                    <li className="flex items-center gap-3">
+                                        <Mail className="w-4 h-4 text-blue-400 shrink-0" />
                                         <a
-                                            href="https://laravel.com/docs"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
+                                            href="mailto:sekretariat@hkbpcitraindah.org"
+                                            className="hover:text-blue-300 transition-colors"
                                         >
-                                            <span>Documentation</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
+                                            sekretariat@hkbpcitraindah.org
                                         </a>
-                                    </span>
-                                </li>
-                                <li className="relative flex items-center gap-4 py-2 before:absolute before:top-0 before:bottom-1/2 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
-                                    <span className="relative bg-white py-1 dark:bg-[#161615]">
-                                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
-                                        </span>
-                                    </span>
-                                    <span>
-                                        Watch video tutorials at
-                                        <a
-                                            href="https://laracasts.com"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
-                                        >
-                                            <span>Laracasts</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
-                                        </a>
-                                    </span>
-                                </li>
-                            </ul>
-                            <ul className="flex gap-3 text-sm leading-normal">
-                                <li>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Column 3: Sosial Media */}
+                            <div>
+                                <h4 className="text-white font-bold text-sm tracking-wide mb-4">
+                                    Sosial Media
+                                </h4>
+                                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-4">
+                                    Ikuti kegiatan kami melalui platform sosial media resmi gereja.
+                                </p>
+                                {/* Social Media Icons */}
+                                <div className="flex items-center gap-3">
+                                    {/* Facebook */}
                                     <a
-                                        href="https://cloud.laravel.com"
+                                        href="https://facebook.com"
                                         target="_blank"
-                                        className="inline-block rounded-sm border border-black bg-[#1b1b18] px-5 py-1.5 text-sm leading-normal text-white hover:border-black hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:border-white dark:hover:bg-white"
+                                        rel="noopener noreferrer"
+                                        className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-blue-600 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs"
+                                        aria-label="Facebook HKBP Citra Indah"
                                     >
-                                        Deploy now
+                                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                            <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+                                        </svg>
                                     </a>
-                                </li>
-                            </ul>
+
+                                    {/* Instagram */}
+                                    <a
+                                        href="https://instagram.com"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-pink-600 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs"
+                                        aria-label="Instagram HKBP Citra Indah"
+                                    >
+                                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                        </svg>
+                                    </a>
+
+                                    {/* YouTube */}
+                                    <a
+                                        href="https://youtube.com"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-red-600 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 shadow-xs"
+                                        aria-label="YouTube HKBP Citra Indah"
+                                    >
+                                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <div className="relative -mb-px aspect-[335/364] w-full shrink-0 overflow-hidden rounded-t-lg bg-[#fff2f2] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[438px] lg:rounded-t-none lg:rounded-r-lg dark:bg-[#1D0002]">
-                            {/* Laravel Logo */}
-                            <svg
-                                className="w-full max-w-none translate-y-0 text-[#F53003] opacity-100 transition-all duration-750 dark:text-[#F61500] starting:opacity-0 motion-safe:starting:translate-y-6"
-                                viewBox="0 0 438 104"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M17.2036 -3H0V102.197H49.5189V86.7187H17.2036V-3Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M110.256 41.6337C108.061 38.1275 104.945 35.3731 100.905 33.3681C96.8667 31.3647 92.8016 30.3618 88.7131 30.3618C83.4247 30.3618 78.5885 31.3389 74.201 33.2923C69.8111 35.2456 66.0474 37.928 62.9059 41.3333C59.7643 44.7401 57.3198 48.6726 55.5754 53.1293C53.8287 57.589 52.9572 62.274 52.9572 67.1813C52.9572 72.1925 53.8287 76.8995 55.5754 81.3069C57.3191 85.7173 59.7636 89.6241 62.9059 93.0293C66.0474 96.4361 69.8119 99.1155 74.201 101.069C78.5885 103.022 83.4247 103.999 88.7131 103.999C92.8016 103.999 96.8667 102.997 100.905 100.994C104.945 98.9911 108.061 96.2359 110.256 92.7282V102.195H126.563V32.1642H110.256V41.6337ZM108.76 75.7472C107.762 78.4531 106.366 80.8078 104.572 82.8112C102.776 84.8161 100.606 86.4183 98.0637 87.6206C95.5202 88.823 92.7004 89.4238 89.6103 89.4238C86.5178 89.4238 83.7252 88.823 81.2324 87.6206C78.7388 86.4183 76.5949 84.8161 74.7998 82.8112C73.004 80.8078 71.6319 78.4531 70.6856 75.7472C69.7356 73.0421 69.2644 70.1868 69.2644 67.1821C69.2644 64.1758 69.7356 61.3205 70.6856 58.6154C71.6319 55.9102 73.004 53.5571 74.7998 51.5522C76.5949 49.5495 78.738 47.9451 81.2324 46.7427C83.7252 45.5404 86.5178 44.9396 89.6103 44.9396C92.7012 44.9396 95.5202 45.5404 98.0637 46.7427C100.606 47.9451 102.776 49.5487 104.572 51.5522C106.367 53.5571 107.762 55.9102 108.76 58.6154C109.756 61.3205 110.256 64.1758 110.256 67.1821C110.256 70.1868 109.756 73.0421 108.76 75.7472Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M242.805 41.6337C240.611 38.1275 237.494 35.3731 233.455 33.3681C229.416 31.3647 225.351 30.3618 221.262 30.3618C215.974 30.3618 211.138 31.3389 206.75 33.2923C202.36 35.2456 198.597 37.928 195.455 41.3333C192.314 44.7401 189.869 48.6726 188.125 53.1293C186.378 57.589 185.507 62.274 185.507 67.1813C185.507 72.1925 186.378 76.8995 188.125 81.3069C189.868 85.7173 192.313 89.6241 195.455 93.0293C198.597 96.4361 202.361 99.1155 206.75 101.069C211.138 103.022 215.974 103.999 221.262 103.999C225.351 103.999 229.416 102.997 233.455 100.994C237.494 98.9911 240.611 96.2359 242.805 92.7282V102.195H259.112V32.1642H242.805V41.6337ZM241.31 75.7472C240.312 78.4531 238.916 80.8078 237.122 82.8112C235.326 84.8161 233.156 86.4183 230.614 87.6206C228.07 88.823 225.251 89.4238 222.16 89.4238C219.068 89.4238 216.275 88.823 213.782 87.6206C211.289 86.4183 209.145 84.8161 207.35 82.8112C205.554 80.8078 204.182 78.4531 203.236 75.7472C202.286 73.0421 201.814 70.1868 201.814 67.1821C201.814 64.1758 202.286 61.3205 203.236 58.6154C204.182 55.9102 205.554 53.5571 207.35 51.5522C209.145 49.5495 211.288 47.9451 213.782 46.7427C216.275 45.5404 219.068 44.9396 222.16 44.9396C225.251 44.9396 228.07 45.5404 230.614 46.7427C233.156 47.9451 235.326 49.5487 237.122 51.5522C238.917 53.5571 240.312 55.9102 241.31 58.6154C242.306 61.3205 242.806 64.1758 242.806 67.1821C242.805 70.1868 242.305 73.0421 241.31 75.7472Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M438 -3H421.694V102.197H438V-3Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M139.43 102.197H155.735V48.2834H183.712V32.1665H139.43V102.197Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M324.49 32.1665L303.995 85.794L283.498 32.1665H266.983L293.748 102.197H314.242L341.006 32.1665H324.49Z"
-                                    fill="currentColor"
-                                />
-                                <path
-                                    d="M376.571 30.3656C356.603 30.3656 340.797 46.8497 340.797 67.1828C340.797 89.6597 356.094 104 378.661 104C391.29 104 399.354 99.1488 409.206 88.5848L398.189 80.0226C398.183 80.031 389.874 90.9895 377.468 90.9895C363.048 90.9895 356.977 79.3111 356.977 73.269H411.075C413.917 50.1328 398.775 30.3656 376.571 30.3656ZM357.02 61.0967C357.145 59.7487 359.023 43.3761 376.442 43.3761C393.861 43.3761 395.978 59.7464 396.099 61.0967H357.02Z"
-                                    fill="currentColor"
-                                />
-                            </svg>
 
-                            {/* 13 */}
-                            <svg
-                                className="relative -mt-[6.6rem] -ml-8 w-[438px] max-w-none [--stroke-color:#1B1B18] lg:ml-0 dark:[--stroke-color:#FF750F]"
-                                viewBox="0 0 440 392"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <g className="text-[#1B1B18] opacity-100 mix-blend-darken transition-all delay-300 duration-750 dark:text-black dark:mix-blend-normal starting:opacity-0">
-                                    <mask
-                                        id="path-1-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="-0.328613"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="-0.328613"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z" />
-                                        <path d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M234.936 400.8C204.136 400.8 178.936 392.4 159.336 375.6C140.136 358.8 130.536 337 130.536 310.2H200.736C200.736 318.2 203.736 324.8 209.736 330C215.736 335.2 223.736 337.8 233.736 337.8C243.336 337.8 251.136 335 257.136 329.4C263.536 323.8 266.736 316.6 266.736 307.8C266.736 299.8 263.936 293.2 258.336 288C252.736 282.8 245.536 280.2 236.736 280.2H199.536V218.4H236.736C243.536 218.4 249.336 216 254.136 211.2C258.936 206.4 261.336 200.4 261.336 193.2C261.336 184.8 258.736 178.2 253.536 173.4C248.336 168.6 241.736 166.2 233.736 166.2C226.536 166.2 220.336 168.4 215.136 172.8C210.336 177.2 207.936 182.8 207.936 189.6H141.336C141.336 164.8 150.136 144.6 167.736 129C185.336 113 207.936 105 235.536 105C263.136 105 285.536 112.2 302.736 126.6C320.336 141 329.136 160 329.136 183.6C329.136 200.8 324.536 214.8 315.336 225.6C306.136 236 294.336 243.2 279.936 247.2C297.136 252 310.736 260.2 320.736 271.8C331.136 283.4 336.336 298 336.336 315.6C336.336 340.4 326.936 360.8 308.136 376.8C289.336 392.8 264.936 400.8 234.936 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-1-mask)"
-                                    />
-                                    <path
-                                        d="M26.8714 167.6H1.67139V105.2H94.6714V400.2H26.8714V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-1-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F3BEC7] opacity-100 transition-all delay-400 duration-750 dark:text-[#4B0600] starting:opacity-0 motion-safe:starting:-translate-x-[26px]">
-                                    <mask
-                                        id="path-2-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="25.3357"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="25.3357"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z" />
-                                        <path d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M260.6 400.8C229.8 400.8 204.6 392.4 185 375.6C165.8 358.8 156.2 337 156.2 310.2H226.4C226.4 318.2 229.4 324.8 235.4 330C241.4 335.2 249.4 337.8 259.4 337.8C269 337.8 276.8 335 282.8 329.4C289.2 323.8 292.4 316.6 292.4 307.8C292.4 299.8 289.6 293.2 284 288C278.4 282.8 271.2 280.2 262.4 280.2H225.2V218.4H262.4C269.2 218.4 275 216 279.8 211.2C284.6 206.4 287 200.4 287 193.2C287 184.8 284.4 178.2 279.2 173.4C274 168.6 267.4 166.2 259.4 166.2C252.2 166.2 246 168.4 240.8 172.8C236 177.2 233.6 182.8 233.6 189.6H167C167 164.8 175.8 144.6 193.4 129C211 113 233.6 105 261.2 105C288.8 105 311.2 112.2 328.4 126.6C346 141 354.8 160 354.8 183.6C354.8 200.8 350.2 214.8 341 225.6C331.8 236 320 243.2 305.6 247.2C322.8 252 336.4 260.2 346.4 271.8C356.8 283.4 362 298 362 315.6C362 340.4 352.6 360.8 333.8 376.8C315 392.8 290.6 400.8 260.6 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-2-mask)"
-                                    />
-                                    <path
-                                        d="M52.5357 167.6H27.3357V105.2H120.336V400.2H52.5357V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-2-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F8B803] opacity-100 mix-blend-color transition-all delay-400 duration-750 dark:text-[#391800] dark:mix-blend-hard-light starting:opacity-0 motion-safe:starting:-translate-x-[51px]">
-                                    <mask
-                                        id="path-3-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="51"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="51"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z" />
-                                        <path d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M286.264 400.8C255.464 400.8 230.264 392.4 210.664 375.6C191.464 358.8 181.864 337 181.864 310.2H252.064C252.064 318.2 255.064 324.8 261.064 330C267.064 335.2 275.064 337.8 285.064 337.8C294.664 337.8 302.464 335 308.464 329.4C314.864 323.8 318.064 316.6 318.064 307.8C318.064 299.8 315.264 293.2 309.664 288C304.064 282.8 296.864 280.2 288.064 280.2H250.864V218.4H288.064C294.864 218.4 300.664 216 305.464 211.2C310.264 206.4 312.664 200.4 312.664 193.2C312.664 184.8 310.064 178.2 304.864 173.4C299.664 168.6 293.064 166.2 285.064 166.2C277.864 166.2 271.664 168.4 266.464 172.8C261.664 177.2 259.264 182.8 259.264 189.6H192.664C192.664 164.8 201.464 144.6 219.064 129C236.664 113 259.264 105 286.864 105C314.464 105 336.864 112.2 354.064 126.6C371.664 141 380.464 160 380.464 183.6C380.464 200.8 375.864 214.8 366.664 225.6C357.464 236 345.664 243.2 331.264 247.2C348.464 252 362.064 260.2 372.064 271.8C382.464 283.4 387.664 298 387.664 315.6C387.664 340.4 378.264 360.8 359.464 376.8C340.664 392.8 316.264 400.8 286.264 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-3-mask)"
-                                    />
-                                    <path
-                                        d="M78.2 167.6H53V105.2H146V400.2H78.2V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-3-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F3BEC7] opacity-100 mix-blend-multiply transition-all delay-400 duration-750 dark:text-[#733000] dark:mix-blend-normal starting:opacity-0 motion-safe:starting:-translate-x-[78px]">
-                                    <mask
-                                        id="path-4-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="76.6643"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="76.6643"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z" />
-                                        <path d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M311.929 400.8C281.129 400.8 255.929 392.4 236.329 375.6C217.129 358.8 207.529 337 207.529 310.2H277.729C277.729 318.2 280.729 324.8 286.729 330C292.729 335.2 300.729 337.8 310.729 337.8C320.329 337.8 328.129 335 334.129 329.4C340.529 323.8 343.729 316.6 343.729 307.8C343.729 299.8 340.929 293.2 335.329 288C329.729 282.8 322.529 280.2 313.729 280.2H276.529V218.4H313.729C320.529 218.4 326.329 216 331.129 211.2C335.929 206.4 338.329 200.4 338.329 193.2C338.329 184.8 335.729 178.2 330.529 173.4C325.329 168.6 318.729 166.2 310.729 166.2C303.529 166.2 297.329 168.4 292.129 172.8C287.329 177.2 284.929 182.8 284.929 189.6H218.329C218.329 164.8 227.129 144.6 244.729 129C262.329 113 284.929 105 312.529 105C340.129 105 362.529 112.2 379.729 126.6C397.329 141 406.129 160 406.129 183.6C406.129 200.8 401.529 214.8 392.329 225.6C383.129 236 371.329 243.2 356.929 247.2C374.129 252 387.729 260.2 397.729 271.8C408.129 283.4 413.329 298 413.329 315.6C413.329 340.4 403.929 360.8 385.129 376.8C366.329 392.8 341.929 400.8 311.929 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-4-mask)"
-                                    />
-                                    <path
-                                        d="M103.864 167.6H78.6643V105.2H171.664V400.2H103.864V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-4-mask)"
-                                    />
-                                </g>
-
-                                <g className="text-[#F3BEC7] opacity-100 mix-blend-hard-light transition-all delay-400 duration-750 dark:text-[#4B0600] starting:opacity-0 motion-safe:starting:-translate-x-[102px]">
-                                    <mask
-                                        id="path-5-mask"
-                                        maskUnits="userSpaceOnUse"
-                                        x="102.329"
-                                        y="103"
-                                        width="338"
-                                        height="299"
-                                        fill="black"
-                                    >
-                                        <rect
-                                            fill="white"
-                                            x="102.329"
-                                            y="103"
-                                            width="338"
-                                            height="299"
-                                        />
-                                        <path d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z" />
-                                        <path d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z" />
-                                    </mask>
-                                    <path
-                                        d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M337.593 400.8C306.793 400.8 281.593 392.4 261.993 375.6C242.793 358.8 233.193 337 233.193 310.2H303.393C303.393 318.2 306.393 324.8 312.393 330C318.393 335.2 326.393 337.8 336.393 337.8C345.993 337.8 353.793 335 359.793 329.4C366.193 323.8 369.393 316.6 369.393 307.8C369.393 299.8 366.593 293.2 360.993 288C355.393 282.8 348.193 280.2 339.393 280.2H302.193V218.4H339.393C346.193 218.4 351.993 216 356.793 211.2C361.593 206.4 363.993 200.4 363.993 193.2C363.993 184.8 361.393 178.2 356.193 173.4C350.993 168.6 344.393 166.2 336.393 166.2C329.193 166.2 322.993 168.4 317.793 172.8C312.993 177.2 310.593 182.8 310.593 189.6H243.993C243.993 164.8 252.793 144.6 270.393 129C287.993 113 310.593 105 338.193 105C365.793 105 388.193 112.2 405.393 126.6C422.993 141 431.793 160 431.793 183.6C431.793 200.8 427.193 214.8 417.993 225.6C408.793 236 396.993 243.2 382.593 247.2C399.793 252 413.393 260.2 423.393 271.8C433.793 283.4 438.993 298 438.993 315.6C438.993 340.4 429.593 360.8 410.793 376.8C391.993 392.8 367.593 400.8 337.593 400.8Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-5-mask)"
-                                    />
-                                    <path
-                                        d="M129.529 167.6H104.329V105.2H197.329V400.2H129.529V167.6Z"
-                                        stroke="var(--stroke-color)"
-                                        strokeWidth="2.4"
-                                        mask="url(#path-5-mask)"
-                                    />
-                                </g>
-                            </svg>
-                            <div className="absolute inset-0 rounded-t-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-t-none lg:rounded-r-lg dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
+                        {/* Bottom Bar: Copyright & Policies */}
+                        <div className="mt-12 pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
+                            <p>© 2026 HKBP Citra Indah Jonggol. All rights reserved.</p>
+                            <div className="flex items-center gap-6">
+                                <a href="#" className="hover:text-slate-400 transition-colors">
+                                    Kebijakan Privasi
+                                </a>
+                                <a href="#" className="hover:text-slate-400 transition-colors">
+                                    Syarat & Ketentuan
+                                </a>
+                            </div>
                         </div>
-                    </main>
-                </div>
-                <div className="hidden h-14.5 lg:block"></div>
+                    </div>
+                </footer>
             </div>
         </>
     );
