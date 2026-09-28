@@ -29,51 +29,71 @@ export function NavMain({
 
     return (
         <SidebarGroup className="px-2 py-0">
-            {label && <SidebarGroupLabel className="text-xs font-semibold tracking-wider text-slate-400 uppercase">{label}</SidebarGroupLabel>}
+            {label && (
+                <SidebarGroupLabel className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                    {label}
+                </SidebarGroupLabel>
+            )}
             <SidebarMenu>
                 {items.map((item) => {
                     const hasSubItems = item.items && item.items.length > 0;
-                    const isSubItemActive = hasSubItems && item.items?.some((sub) => isCurrentUrl(sub.href));
+                    const isSubItemActive =
+                        hasSubItems &&
+                        item.items?.some((sub) => isCurrentUrl(sub.href));
 
                     if (hasSubItems) {
                         return (
-                            <Collapsible
-                                key={item.title}
-                                asChild
-                                defaultOpen={item.isActive || isSubItemActive}
-                                className="group/collapsible"
-                            >
-                                <SidebarMenuItem>
+                            <SidebarMenuItem key={item.title}>
+                                <Collapsible
+                                    defaultOpen={
+                                        item.title === 'Master' ||
+                                        item.isActive ||
+                                        isSubItemActive
+                                    }
+                                    className="group/collapsible w-full"
+                                >
                                     <CollapsibleTrigger asChild>
                                         <SidebarMenuButton
                                             tooltip={item.title}
-                                            className="font-medium text-slate-700 hover:text-[#1e3a8a] hover:bg-blue-50/80 transition-colors"
+                                            className="w-full cursor-pointer font-medium text-slate-700 transition-colors hover:bg-blue-50/80 hover:text-[#1e3a8a]"
                                         >
-                                            {item.icon && <item.icon className="w-4 h-4 text-slate-500 group-hover/collapsible:text-[#1e3a8a]" />}
+                                            {item.icon && (
+                                                <item.icon className="h-4 w-4 text-slate-500 group-hover/collapsible:text-[#1e3a8a]" />
+                                            )}
                                             <span>{item.title}</span>
-                                            <ChevronRight className="ml-auto w-4 h-4 text-slate-400 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                            <ChevronRight className="ml-auto h-4 w-4 text-slate-400 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                         </SidebarMenuButton>
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
-                                        <SidebarMenuSub className="border-l border-blue-100 ml-3.5 pl-2 my-0.5">
+                                        <SidebarMenuSub className="my-0.5 ml-3.5 border-l border-blue-100 pl-2">
                                             {item.items?.map((subItem) => (
-                                                <SidebarMenuSubItem key={subItem.title}>
+                                                <SidebarMenuSubItem
+                                                    key={subItem.title}
+                                                >
                                                     <SidebarMenuSubButton
                                                         asChild
-                                                        isActive={isCurrentUrl(subItem.href)}
-                                                        className="text-xs font-normal text-slate-600 hover:text-[#1e3a8a] hover:bg-blue-50/60 data-[active=true]:bg-blue-50 data-[active=true]:text-[#1e3a8a] data-[active=true]:font-semibold rounded-md"
+                                                        isActive={isCurrentUrl(
+                                                            subItem.href,
+                                                        )}
+                                                        className="rounded-md text-xs font-normal text-slate-600 hover:bg-blue-50/60 hover:text-[#1e3a8a] data-[active=true]:bg-blue-50 data-[active=true]:font-semibold data-[active=true]:text-[#1e3a8a]"
                                                     >
-                                                        <Link href={subItem.href}>
-                                                            {subItem.icon && <subItem.icon className="w-3.5 h-3.5 mr-1 text-slate-400" />}
-                                                            <span>{subItem.title}</span>
+                                                        <Link
+                                                            href={subItem.href}
+                                                        >
+                                                            {subItem.icon && (
+                                                                <subItem.icon className="mr-1 h-3.5 w-3.5 text-slate-400" />
+                                                            )}
+                                                            <span>
+                                                                {subItem.title}
+                                                            </span>
                                                         </Link>
                                                     </SidebarMenuSubButton>
                                                 </SidebarMenuSubItem>
                                             ))}
                                         </SidebarMenuSub>
                                     </CollapsibleContent>
-                                </SidebarMenuItem>
-                            </Collapsible>
+                                </Collapsible>
+                            </SidebarMenuItem>
                         );
                     }
 
@@ -83,10 +103,12 @@ export function NavMain({
                                 asChild
                                 isActive={isCurrentUrl(item.href || '')}
                                 tooltip={{ children: item.title }}
-                                className="font-medium text-slate-700 hover:text-[#1e3a8a] hover:bg-blue-50/80 data-[active=true]:bg-[#1e3a8a] data-[active=true]:text-white rounded-lg transition-colors"
+                                className="rounded-lg font-medium text-slate-700 transition-colors hover:bg-blue-50/80 hover:text-[#1e3a8a] data-[active=true]:bg-[#1e3a8a] data-[active=true]:text-white"
                             >
                                 <Link href={item.href || '#'} prefetch>
-                                    {item.icon && <item.icon className="w-4 h-4" />}
+                                    {item.icon && (
+                                        <item.icon className="h-4 w-4" />
+                                    )}
                                     <span>{item.title}</span>
                                 </Link>
                             </SidebarMenuButton>

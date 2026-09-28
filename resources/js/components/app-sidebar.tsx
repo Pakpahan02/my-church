@@ -129,11 +129,19 @@ const mainNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset" className="border-r border-slate-100 bg-white">
+        <Sidebar
+            collapsible="icon"
+            variant="inset"
+            className="border-r border-slate-100 bg-white"
+        >
             <SidebarHeader className="border-b border-slate-100/80 px-3 py-3">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild className="hover:bg-blue-50/50 transition-colors">
+                        <SidebarMenuButton
+                            size="lg"
+                            asChild
+                            className="transition-colors hover:bg-blue-50/50"
+                        >
                             <Link href={dashboard()} prefetch>
                                 <AppLogo />
                             </Link>
