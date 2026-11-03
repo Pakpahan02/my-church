@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Master\JemaatController;
 use App\Http\Controllers\Master\PenggunaController;
 use App\Http\Controllers\Master\WilayahController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('pengguna/index', [PenggunaController::class, 'index'])->name('pengguna.index.alias');
         Route::resource('pengguna', PenggunaController::class)->where(['pengguna' => '[0-9]+']);
+
+        Route::get('jemaat/index', [JemaatController::class, 'index'])->name('jemaat.index.alias');
+        Route::get('jemaat', [JemaatController::class, 'index'])->name('jemaat.index');
+        Route::post('jemaat/keluarga', [JemaatController::class, 'storeKeluarga'])->name('jemaat.keluarga.store');
+        Route::put('jemaat/keluarga/{keluarga}', [JemaatController::class, 'updateKeluarga'])->name('jemaat.keluarga.update');
+        Route::delete('jemaat/keluarga/{keluarga}', [JemaatController::class, 'destroyKeluarga'])->name('jemaat.keluarga.destroy');
+        Route::post('jemaat/keluarga/{keluarga}/anggota', [JemaatController::class, 'storeAnggota'])->name('jemaat.anggota.store');
+        Route::post('jemaat/anggota/{jemaat}', [JemaatController::class, 'updateAnggota'])->name('jemaat.anggota.update');
+        Route::delete('jemaat/anggota/{jemaat}', [JemaatController::class, 'destroyAnggota'])->name('jemaat.anggota.destroy');
     });
 });
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -22,4 +23,12 @@ class Wilayah extends Model
         'name',
         'keterangan',
     ];
+
+    /**
+     * Relasi ke Keluarga di Wilayah ini
+     */
+    public function keluargas(): HasMany
+    {
+        return $this->hasMany(Keluarga::class);
+    }
 }
