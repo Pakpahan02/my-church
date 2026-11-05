@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Marturia\AnggotaMarturiaController;
 use App\Http\Controllers\Master\JemaatController;
 use App\Http\Controllers\Master\PenggunaController;
 use App\Http\Controllers\Master\WilayahController;
@@ -25,6 +26,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('jemaat/keluarga/{keluarga}/anggota', [JemaatController::class, 'storeAnggota'])->name('jemaat.anggota.store');
         Route::post('jemaat/anggota/{jemaat}', [JemaatController::class, 'updateAnggota'])->name('jemaat.anggota.update');
         Route::delete('jemaat/anggota/{jemaat}', [JemaatController::class, 'destroyAnggota'])->name('jemaat.anggota.destroy');
+    });
+
+    Route::prefix('marturia')->name('marturia.')->group(function () {
+        Route::get('anggota/index', [AnggotaMarturiaController::class, 'index'])->name('anggota.index.alias');
+        Route::resource('anggota', AnggotaMarturiaController::class)
+            ->parameters(['anggota' => 'anggota'])
+            ->where(['anggota' => '[0-9]+']);
     });
 });
 
