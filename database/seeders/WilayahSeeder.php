@@ -57,9 +57,9 @@ class WilayahSeeder extends Seeder
 
         foreach ($wilayahs as $item) {
             Wilayah::updateOrCreate(
-                ['name' => $item['name']],
+                ['nomor_wilayah' => $item['nomor_wilayah']],
                 [
-                    'nomor_wilayah' => $item['nomor_wilayah'],
+                    'name' => $item['name'],
                     'keterangan' => $item['keterangan'],
                 ]
             );
